@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Código de la Insulina - Asistente Metabólico</title>
+    <style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Código de la Insulina - Asistente Metabólico</title>
+    <style>
+        :root {
+            --primary: #0d9488;
+            --primary-dark: #115e59;
+            --primary-light: #ccfbf1;
+            --gold: #d97706;
+            --gold-light: #fef3c7;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --success: #16a34a;
+            --success-light: #dcfce7;
+            --warning: #ea580c;
+            --warning-light: #ffedd5;
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 15px 10px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Cabecera Premium */
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 15px -3px rgba(13, 148, 136, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-container {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 12px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* En caso de que no cargue la imagen, usa este estilo */
+        .logo-fallback {
+            font-size: 2.2rem;
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        header h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        header p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        /* Barra de Progreso del Asistente */
+        .progress-container {
+            margin-bottom: 20px;
+            background: var(--border);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 20%;
+            background: var(--gold);
+            transition: width 0.4s ease;
+        }
+
+        /* Estructura de Pasos (Wizard) */
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            color: var(--primary-dark);
+            font-weight: 700;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            background-color: var(--bg);
+            transition: all 0.2s;
+        }
+
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+            background-color: white;
+        }
+
+        /* Botones de opción de Género */
+        .gender-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .gender-btn {
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .gender-btn.selected {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        /* Preguntas de Cuestionarios */
+        .question-block {
+            background-color: var(--bg);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .question-text {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        /* Estructura de Navegación */
+        .nav-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .nav-buttons.single {
+            grid-template-columns: 1fr;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px rgba(13, 148, 136, 0.15);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: var(--text-light);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* Cronómetro Interactivo para Fuerza Funcional */
+        .timer-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-top: 10px;
+        }
+
+        .timer-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            font-family: monospace;
+            color: var(--primary-dark);
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .timer-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+
+        .timer-start { background-color: var(--success); color: white; }
+        .timer-stop { background-color: var(--danger); color: white; }
+        .timer-reset { background-color: var(--text-light); color: white; }
+
+        /* Reporte Final de Resiliencia */
+        .result-header {
+            text-align: center;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .result-header.verde {
+            background-color: var(--success-light);
+            color: var(--success);
+            border: 2px solid var(--success);
+        }
+
+        .result-header.amarillo {
+            background-color: var(--warning-light);
+            color: var(--warning);
+            border: 2px solid var(--warning);
+        }
+
+        .result-header.rojo {
+            background-color: var(--danger-light);
+            color: var(--danger);
+            border: 2px solid var(--danger);
+        }
+
+        .metric-badge {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: var(--bg);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .badge-status {
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        /* Tarjetas de Acción de Contacto */
+        .cta-box {
+            background: var(--gold-light);
+            border: 1px solid var(--gold);
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .cta-box h4 {
+            color: var(--gold);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn-whatsapp {
+            background-color: #25d366;
+            color: white;
+            box-shadow: 0 4px 6px rgba(37, 211, 102, 0.15);
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #128c7e;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Estilo para Impresión de Reporte (PDF local) */
+        @media print {
+            body { background: white; color: black; }
+            .nav-buttons, .progress-container, .timer-container, .cta-box { display: none !important; }
+            .step { display: none !important; }
+            .step#step-5 { display: block !important; }
+            .card { border: none; box-shadow: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <header>
+        <div class="logo-container">
+            <img src="logo_clinico.png" alt="Dr. Neptalí Godoy" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="logo-fallback" style="display:none;">NG</div>
+        </div>
+        <h1>El Código de la Insulina</h1>
+        <p>Evaluación de Resiliencia y Entorno Metabólico</p>
+    </header>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="step active" id="step-1">
+        <div class="card">
+            <div class="card-title">👤 Datos Corporales Básicos</div>
+            <p style="color: var(--text-light); font-size: 0.85rem; margin-bottom: 15px;">
+                Toda la información es analizada localmente en tu teléfono. Tu privacidad está garantizada.
+            </p>
+            
+            <div class="form-group">
+                <label>Nombre Completo</label>
+                <input type="text" id="paciente-nombre" placeholder="Tu nombre" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg);">
+            </div>
+
+            <div class="form-group">
+                <label>Sexo Biológico</label>
+                <div class="gender-selector">
+                    <div class="gender-btn selected" id="gender-M" onclick="setGender('M')">Masculino</div>
+                    <div class="gender-btn" id="gender-F" onclick="setGender('F')">Femenino</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="estatura">Estatura (en centímetros)</label>
+                <input type="number" id="estatura" placeholder="Ej. 170" min="100" max="250">
+            </div>
+
+            <div class="form-group">
+                <label for="cintura">Circunferencia de Cintura (cm)</label>
+                <input type="number" id="cintura" placeholder="Medida a nivel del ombligo" min="40" max="200">
+            </div>
+        </div>
+        
+        <div class="nav-buttons single">
+            <button class="btn btn-primary" onclick="nextStep(2)">Siguiente Paso ➡️</button>
+        </div>
+    </div>
+
+    <div class="step" id="step-2">
+        <div class="card">
+            <div class="card-title">🧪 Datos de Laboratorio (Opcional)</div>
+            <p style="color: var(--text-light); font-size: 0.85rem; margin-bottom: 15px;">
+                Si posees exámenes de sangre recientes, puedes colocarlos. Si no los tienes, puedes continuar sin problemas.
+            </p>
+
+            <div class="form-group">
+                <label for="glucosa">Glucosa Basal (mg/dL)</label>
+                <input type="number" id="glucosa" placeholder="Ej. 90 (opcional)" min="30" max="400">
+            </div>
+
+            <div class="form-group">
+                <label for="insulina">Insulina Basal (µU/mL)</label>
+                <input type="number" id="insulina" placeholder="Ej. 12 (opcional)" min="1" max="150">
+            </div>
+        </div>
+        
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="prevStep(1)">⬅️ Atrás</button>
+            <button class="btn btn-primary" onclick="nextStep(3)">Siguiente ➡️</button>
+        </div>
+    </div>
+
+    <div class="step" id="step-3">
+        <div class="card">
+            <div class="card-title">⏰ Auditoría de Cronodisrupción</div>
+            
+            <div class="question-block">
+                <div class="question-text">¿Cuándo recibes tu primera dosis de luz solar matutina?</div>
+                <select id="crono1">
+                    <option value="0">Antes de las 8:00 AM (0 pts)</option>
+                    <option value="1">Entre las 8:00 AM y 11:00 AM (1 pt)</option>
+                    <option value="3">Casi nunca salgo temprano al sol (3 pts)</option>
+                </select>
+            </div>
+
+            <div class="question-block">
+                <div class="question-text">¿A qué hora cenás o realizas tu última comida?</div>
+                <select id="crono2">
+                    <option value="0">Al menos 3 horas antes de acostarme (0 pts)</option>
+                    <option value="2">1 o 2 horas antes de dormir (2 pts)</option>
+                    <option value="4">Ceno justo antes de ir a dormir (4 pts)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🧠 Escala de Estresores Crónicos</div>
+
+            <div class="question-block">
+                <div class="question-text">¿Te despiertas con frecuencia de madrugada rumiando pendientes?</div>
+                <select id="estres1">
+                    <option value="0">Rara vez o nunca (0 pts)</option>
+                    <option value="1">Ocasionalmente (1 pt)</option>
+                    <option value="2">Casi todas las noches (2 pts)</option>
+                </select>
+            </div>
+
+            <div class="question-block">
+                <div class="question-text">¿Sientes constantemente prisa o que el tiempo no te alcanza?</div>
+                <select id="estres2">
+                    <option value="0">No, gestiono bien mi tiempo (0 pts)</option>
+                    <option value="1">A veces me siento abrumado/a (1 pt)</option>
+                    <option value="2">Es mi estado permanente (2 pts)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🍃 Salud Intestinal e Higiene Química</div>
+
+            <div class="question-block">
+                <div class="question-text">¿Sufres de inflamación/distensión abdominal tras las comidas?</div>
+                <select id="gut1">
+                    <option value="0">Rara vez o nunca (0 pts)</option>
+                    <option value="1">A veces de forma leve (1 pt)</option>
+                    <option value="2">Con mucha frecuencia o dolor (2 pts)</option>
+                </select>
+            </div>
+
+            <div class="question-block">
+                <div class="question-text">¿Utilizas envases de plástico para calentar comidas en microondas?</div>
+                <select id="chem1">
+                    <option value="0">No, uso vidrio, cerámica o metal (0 pts)</option>
+                    <option value="1">Ocasionalmente (1 pt)</option>
+                    <option value="2">Sí, es mi práctica habitual (2 pts)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="prevStep(2)">⬅️ Atrás</button>
+            <button class="btn btn-primary" onclick="nextStep(4)">Siguiente ➡️</button>
+        </div>
+    </div>
+
+    <div class="step" id="step-4">
+        <div class="card">
+            <div class="card-title">💪 4. Test de Fuerza Funcional</div>
+            <p style="color: var(--text-light); font-size: 0.85rem; margin-bottom: 15px;">
+                La musculatura es tu mayor sumidero de glucosa. Evaluemos la salud de tu motor utilizando los cronómetros incorporados:
+            </p>
+
+            <div class="question-block">
+                <div class="question-text">1. Test de la Silla (Sentarse/Levantarse en 60 seg):</div>
+                <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 8px;">
+                    Cuenta cuántas veces logras levantarte y sentarte completamente de una silla estable durante 60 segundos.
+                </p>
+                <div class="timer-container">
+                    <span class="timer-display" id="display-silla">60s</span>
+                    <div class="timer-controls">
+                        <button class="timer-btn timer-start" onclick="startTimer('silla', 60)">Iniciar</button>
+                        <button class="timer-btn timer-stop" onclick="stopTimer('silla')">Pausa</button>
+                    </div>
+                </div>
+                <input type="number" id="fuerza-silla" placeholder="Repeticiones logradas" style="margin-top: 10px;">
+            </div>
+
+            <div class="question-block">
+                <div class="question-text">2. Resistencia de Plancha Estática:</div>
+                <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 8px;">
+                    Mantén la posición de plancha de antebrazos. Detén el cronómetro en el momento en que pierdas la postura correcta.
+                </p>
+                <div class="timer-container">
+                    <span class="timer-display" id="display-plancha">0s</span>
+                    <div class="timer-controls">
+                        <button class="timer-btn timer-start" onclick="startTimerCountUp('plancha')">Iniciar</button>
+                        <button class="timer-btn timer-stop" onclick="stopTimer('plancha')">Detener</button>
+                    </div>
+                </div>
+                <input type="number" id="fuerza-plancha" placeholder="Segundos sostenidos" style="margin-top: 10px;">
+            </div>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="prevStep(3)">⬅️ Atrás</button>
+            <button class="btn btn-primary" onclick="procesarResultados()">Ver Resultados 📊</button>
+        </div>
+    </div>
+
+    <div class="step" id="step-5">
+        <div class="card">
+            <div class="card-title" style="justify-content: center;">📋 Tu Reporte de Resiliencia</div>
+            
+            <div id="semaforo-header" class="result-header">
+                Fase de Evaluación
+            </div>
+
+            <div style="margin-top: 15px;">
+                <h4 style="margin-bottom: 10px; font-size: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 5px;">Métricas de Composición Corporal</h4>
+                
+                <div class="metric-badge">
+                    <span>Índice Cintura-Estatura (ICE)</span>
+                    <span id="badge-ice-res" class="badge-status">--</span>
+                </div>
+                <div class="metric-badge">
+                    <span>Circunferencia Abdominal</span>
+                    <span id="badge-cintura-res" class="badge-status">--</span>
+                </div>
+                <div class="metric-badge">
+                    <span>HOMA-IR (Marcador de Resistencia)</span>
+                    <span id="badge-homa-res" class="badge-status">--</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h4 style="margin-bottom: 10px; font-size: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 5px;">Ambiente y Capacidad de Reserva</h4>
+                
+                <div class="metric-badge">
+                    <span>Score de Entorno Hostil</span>
+                    <span id="badge-entorno-res" class="badge-status">--</span>
+                </div>
+                <div class="metric-badge">
+                    <span>Fuerza Muscular (GLUT4)</span>
+                    <span id="badge-fuerza-res" class="badge-status">--</span>
+                </div>
+            </div>
+
+            <p id="parrafo-evaluacion" style="margin-top: 20px; font-size: 0.95rem; text-align: justify; line-height: 1.5; font-weight: 500;"></p>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="exportarPDF()">🖨️ Guardar PDF</button>
+            <button class="btn btn-whatsapp" onclick="enviarReporteWhatsApp()">💬 Reportar al Dr.</button>
+        </div>
+
+        <div class="cta-box">
+            <h4>Atención Médica Directa</h4>
+            <p style="font-size: 0.85rem; color: var(--text);">
+                ¿Deseas corregir de raíz tu entorno o necesitas un plan formalizado guiado por el Dr. Neptalí Godoy?
+            </p>
+            <div class="cta-buttons">
+                <button class="btn btn-primary" onclick="solicitarLibro()" style="background-color: var(--gold); border: none;">📘 Quiero adquirir el Libro</button>
+                <button class="btn btn-whatsapp" onclick="agendarCita('Online')">💻 Agenda Cita Online</button>
+                <button class="btn btn-whatsapp" onclick="agendarCita('Domiciliaria')">🏠 Solicitar Cita Domicilio</button>
+            </div>
+        </div>
+
+        <div class="nav-buttons single" style="margin-top: 15px;">
+            <button class="btn btn-secondary" onclick="reiniciarApp()">🔄 Realizar otro Test</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <strong>El Código de la Insulina</strong> • Dr. Neptalí A. Godoy B.<br>
+        Médico Internista • Soporte Clínico Offline.
+    </div>
+
+</div>
+
+<script>
+    // VARIABLE CLÍNICA: Coloque aquí su número de WhatsApp con el código de país. 
+    // Ejemplo para Venezuela: "584120000000"
+    const CLINIC_WHATSAPP = "584129504867"; 
+
+    let currentStep = 1;
+    let selectedGender = 'M';
+    let timers = {};
+
+    function setGender(g) {
+        selectedGender = g;
+        document.getElementById('gender-M').classList.toggle('selected', g === 'M');
+        document.getElementById('gender-F').classList.toggle('selected', g === 'F');
+    }
+
+    function updateProgress(step) {
+        const bar = document.getElementById('progressBar');
+        bar.style.width = (step * 20) + "%";
+    }
+
+    function nextStep(step) {
+        // Validaciones previas
+        if (step === 2) {
+            const estatura = document.getElementById('estatura').value;
+            const cintura = document.getElementById('cintura').value;
+            if (!estatura || !cintura) {
+                alert("Por favor, ingresa tu estatura y circunferencia de cintura antes de continuar.");
+                return;
+            }
+        }
+        
+        document.querySelector(`.step.active`).classList.remove('active');
+        document.getElementById(`step-${step}`).classList.add('active');
+        currentStep = step;
+        updateProgress(step);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function prevStep(step) {
+        document.querySelector(`.step.active`).classList.remove('active');
+        document.getElementById(`step-${step}`).classList.add('active');
+        currentStep = step;
+        updateProgress(step);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Funciones del Cronómetro
+    function startTimer(id, duration) {
+        clearInterval(timers[id]);
+        let timeRemaining = duration;
+        const display = document.getElementById(`display-${id}`);
+        display.innerText = timeRemaining + "s";
+        
+        timers[id] = setInterval(() => {
+            timeRemaining--;
+            display.innerText = timeRemaining + "s";
+            if (timeRemaining <= 0) {
+                clearInterval(timers[id]);
+                alert("¡Tiempo cumplido!");
+            }
+        }, 1000);
+    }
+
+    function startTimerCountUp(id) {
+        clearInterval(timers[id]);
+        let elapsed = 0;
+        const display = document.getElementById(`display-${id}`);
+        display.innerText = "0s";
+        
+        timers[id] = setInterval(() => {
+            elapsed++;
+            display.innerText = elapsed + "s";
+        }, 1000);
+    }
+
+    function stopTimer(id) {
+        clearInterval(timers[id]);
+    }
+
+    // Procesamiento Clínico
+    let globalReportText = ""; 
+
+    function procesarResultados() {
+        const nombre = document.getElementById('paciente-nombre').value || "Paciente";
+        const estatura = parseFloat(document.getElementById('estatura').value);
+        const cintura = parseFloat(document.getElementById('cintura').value);
+        const glucosa = parseFloat(document.getElementById('glucosa').value);
+        const insulina = parseFloat(document.getElementById('insulina').value);
+
+        // Scores de entorno
+        const crono = parseInt(document.getElementById('crono1').value) + parseInt(document.getElementById('crono2').value);
+        const estres = parseInt(document.getElementById('estres1').value) + parseInt(document.getElementById('estres2').value);
+        const intestinal = parseInt(document.getElementById('gut1').value) + parseInt(document.getElementById('chem1').value);
+        const scoreEntorno = crono + estres + intestinal;
+
+        // Fuerza
+        const repsSilla = parseInt(document.getElementById('fuerza-silla').value) || 0;
+        const segPlancha = parseInt(document.getElementById('fuerza-plancha').value) || 0;
+
+        // Cálculos
+        const ice = cintura / estatura;
+        const cinturaAlerta = (selectedGender === 'M' && cintura > 94) || (selectedGender === 'F' && cintura > 88);
+
+        let homa = null;
+        if (!isNaN(glucosa) && !isNaN(insulina)) {
+            homa = (glucosa * insulina) / 405;
+        }
+
+        // Determinar Fase Metabólica General
+        let scorePuntos = 0;
+        if (ice > 0.5) scorePuntos += 2;
+        if (cinturaAlerta) scorePuntos += 2;
+        if (homa && homa >= 1.9) scorePuntos += 3;
+        if (scoreEntorno >= 6) scorePuntos += 2;
+        if (repsSilla < 15 || segPlancha < 30) scorePuntos += 2;
+
+        const headerSemaforo = document.getElementById('semaforo-header');
+        const parrafoEval = document.getElementById('parrafo-evaluacion');
+
+        let diagnosticoFase = "";
+        if (scorePuntos <= 3) {
+            headerSemaforo.className = "result-header verde";
+            headerSemaforo.innerHTML = "🟢 FASE DE SENSIBILIDAD Y ESTABILIDAD";
+            diagnosticoFase = "Fase de Sensibilidad y Estabilidad";
+            parrafoEval.innerText = `Estimado/a ${nombre}, tus células se encuentran actualmente en un entorno sumamente protector y óptimo. El intercambio de nutrientes es fluido y la respuesta de tu insulina es sensible. Continúa protegiendo este estado metabólico mediante el fortalecimiento funcional de tus músculos y una alimentación basada en densidad nutricional real.`;
+        } else if (scorePuntos > 3 && scorePuntos <= 6) {
+            headerSemaforo.className = "result-header amarillo";
+            headerSemaforo.innerHTML = "🟡 FASE DE ADAPTACIÓN Y ALERTA";
+            diagnosticoFase = "Fase de Adaptación y Alerta";
+            parrafoEval.innerText = `Estimado/a ${nombre}, tus células están realizando esfuerzos adicionales de adaptación. No hay un daño instaurado irremediable, pero tu entorno metabólico presenta señales hostiles de alarma como desorden circadiano, grasa abdominal visceral o debilidad muscular. Es el momento clínico perfecto para actuar de raíz antes de que el receptor de insulina desarrolle resistencia severa.`;
+        } else {
+            headerSemaforo.className = "result-header rojo";
+            headerSemaforo.innerHTML = "🔴 FASE DE RECONSTRUCCIÓN Y RESCATE";
+            diagnosticoFase = "Fase de Reconstrucción y Rescate";
+            parrafoEval.innerText = `Estimado/a ${nombre}, tus células se encuentran en estado de alerta defensiva cerrado (resistencia activa) para resguardarse de la sobrecarga de energía o el estrés oxidativo de tu entorno. No estás roto/a; tu cuerpo te está defendiendo del entorno. Necesitas de manera prioritaria implementar el rescate metabólico: reconectar con el sol matinal, aplicar ayuno circadiano y activar tus GLUT4 a través de la fuerza funcional.`;
+        }
+
+        // Actualizar badges individuales
+        document.getElementById('badge-ice-res').innerText = `${ice.toFixed(2)} (${ice <= 0.5 ? 'Bajo Riesgo' : 'Riesgo Elevado'})`;
+        document.getElementById('badge-ice-res').className = "badge-status " + (ice <= 0.5 ? 'badge-verde' : 'badge-rojo');
+
+        document.getElementById('badge-cintura-res').innerText = `${cintura} cm (${cinturaAlerta ? 'Alerta Visceral' : 'Normal'})`;
+        document.getElementById('badge-cintura-res').className = "badge-status " + (cinturaAlerta ? 'badge-rojo' : 'badge-verde');
+
+        if (homa) {
+            let homaMsg = homa < 1.9 ? 'Óptimo' : (homa < 3.0 ? 'Resistencia Moderada' : 'Resistencia Establecida');
+            document.getElementById('badge-homa-res').innerText = `${homa.toFixed(2)} (${homaMsg})`;
+            document.getElementById('badge-homa-res').className = "badge-status " + (homa < 1.9 ? 'badge-verde' : 'badge-rojo');
+        } else {
+            document.getElementById('badge-homa-res').innerText = "No calculado (Sin laboratorios)";
+            document.getElementById('badge-homa-res').className = "badge-status badge-amarillo";
+        }
+
+        document.getElementById('badge-entorno-res').innerText = `${scoreEntorno}/12 Puntos (${scoreEntorno <= 4 ? 'Protector' : 'Hostil'})`;
+        document.getElementById('badge-entorno-res').className = "badge-status " + (scoreEntorno <= 4 ? 'badge-verde' : 'badge-rojo');
+
+        const fuerzaMala = repsSilla < 15 || segPlancha < 30;
+        document.getElementById('badge-fuerza-res').innerText = `${repsSilla} reps / ${segPlancha} seg (${fuerzaMala ? 'Debilidad muscular' : 'Reserva de Fuerza'})`;
+        document.getElementById('badge-fuerza-res').className = "badge-status " + (fuerzaMala ? 'badge-rojo' : 'badge-verde');
+
+        // Construir reporte de texto para compartir
+        globalReportText = `*EL CÓDIGO DE LA INSULINA - REPORTE CLÍNICO*\n\n`;
+        globalReportText += `*Paciente:* ${nombre}\n`;
+        globalReportText += `*Diagnóstico:* ${diagnosticoFase}\n`;
+        globalReportText += `-----------------------------\n`;
+        globalReportText += `*Métricas Fisiológicas:*\n`;
+        globalReportText += `- ICE: ${ice.toFixed(2)} (${ice <= 0.5 ? 'Normal' : 'Exceso de Riesgo'})\n`;
+        globalReportText += `- Cintura: ${cintura} cm (${cinturaAlerta ? 'Alerta Visceral' : 'Normal'})\n`;
+        if (homa) globalReportText += `- HOMA-IR: ${homa.toFixed(2)}\n`;
+        globalReportText += `\n*Fuerza y Reserva Muscular (GLUT4):*\n`;
+        globalReportText += `- Sentadillas (Silla): ${repsSilla} reps\n`;
+        globalReportText += `- Plancha: ${segPlancha} segundos\n`;
+        globalReportText += `\n*Puntaje de Entorno:* ${scoreEntorno}/12 Puntos\n`;
+        globalReportText += `-----------------------------\n`;
+        globalReportText += `_Reporte autogenerado de manera local._`;
+
+        nextStep(5);
+    }
+
+    // Funciones de Envío
+    function enviarReporteWhatsApp() {
+        const url = `https://api.whatsapp.com/send?phone=${CLINIC_WHATSAPP}&text=${encodeURIComponent(globalReportText)}`;
+        window.open(url, '_blank');
+    }
+
+    function agendarCita(tipo) {
+        const texto = `Hola Dr. Neptalí Godoy, he completado mi test metabólico en su aplicación y me gustaría agendar una *Consulta ${tipo}* con usted para evaluar mi salud de manera formal.`;
+        const url = `https://api.whatsapp.com/send?phone=${CLINIC_WHATSAPP}&text=${encodeURIComponent(texto)}`;
+        window.open(url, '_blank');
+    }
+
+    function solicitarLibro() {
+        const texto = `Hola Dr. Neptalí Godoy, me gustaría adquirir una copia de su libro *El Código de la Insulina* de manera directa por este medio.`;
+        const url = `https://api.whatsapp.com/send?phone=${CLINIC_WHATSAPP}&text=${encodeURIComponent(texto)}`;
+        window.open(url, '_blank');
+    }
+
+    function exportarPDF() {
+        window.print();
+    }
+
+    function reiniciarApp() {
+        document.getElementById('paciente-nombre').value = "";
+        document.getElementById('estatura').value = "";
+        document.getElementById('cintura').value = "";
+        document.getElementById('glucosa').value = "";
+        document.getElementById('insulina').value = "";
+        document.getElementById('fuerza-silla').value = "";
+        document.getElementById('fuerza-plancha').value = "";
+        
+        // Reset selectors
+        document.getElementById('crono1').value = "0";
+        document.getElementById('crono2').value = "0";
+        document.getElementById('estres1').value = "0";
+        document.getElementById('estres2').value = "0";
+        document.getElementById('gut1').value = "0";
+        document.getElementById('chem1').value = "0";
+
+        // Reset display
+        document.getElementById('display-silla').innerText = "60s";
+        document.getElementById('display-plancha').innerText = "0s";
+
+        nextStep(1);
+    }
+</script>
+
+</body>
+</html>
+
